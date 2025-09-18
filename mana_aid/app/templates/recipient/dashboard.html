@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}Recipient Dashboard - Mana Aid{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Dashboard Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-hover" style="background: linear-gradient(135deg, var(--success-color), #20c997); color: white;">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="mb-2">
+                                <i class="fas fa-tachometer-alt me-2"></i>Welcome back, {{ current_user.username }}!
+                            </h2>
+                            <p class="mb-0 opacity-75">Track your food requests and find available donations</p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <a href="{{ url_for('recipient.browse_food') }}" class="btn btn-light btn-lg">
+                                <i class="fas fa-search me-2"></i>Browse Food
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-list fa-2x mb-2"></i>
+                    <h3 class="fw-bold">{{ requests|length }}</h3>
+                    <p class="mb-0">Total Requests</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock fa-2x mb-2"></i>
+                    <h3 class="fw-bold">{{ requests|selectattr('status', 'equalto', 'pending')|list|length }}</h3>
+                    <p class="mb-0">Pending</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <h3 class="fw-bold">{{ requests|selectattr('status', 'equalto', 'approved')|list|length }}</h3>
+                    <p class="mb-0">Approved</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-utensils fa-2x mb-2"></i>
+                    <h3 class="fw-bold">{{ requests|selectattr('status', 'equalto', 'completed')|list|length }}</h3>
+                    <p class="mb-0">Completed</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Your Requests Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-hover">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Your Food Requests
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if requests %}
+                        <div class="list-group list-group-flush">
+                            {% for req in requests %}
+                                <div class="list-group-item border-0 mb-3 card-hover">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="mb-1">
+                                                        <i class="fas fa-utensils me-2 text-success"></i>{{ req.surplus_post.title }}
+                                                    </h6>
+                                                    <p class="mb-1 text-muted">
+                                                        <i class="fas fa-user me-1"></i>Donor: {{ req.surplus_post.donor.username }}
+                                                    </p>
+                                                    <p class="mb-1">{{ req.message[:150] }}{% if req.message|length > 150 %}...{% endif %}</p>
+                                                    <div class="row text-center">
+                                                        <div class="col-4">
+                                                            <small class="text-muted d-block">Type</small>
+                                                            <span class="badge bg-info">{{ req.surplus_post.food_type }}</span>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <small class="text-muted d-block">Quantity</small>
+                                                            <span class="fw-semibold">{{ req.surplus_post.quantity }} servings</span>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <small class="text-muted d-block">Pickup Time</small>
+                                                            <span class="fw-semibold">{{ req.preferred_pickup_time.strftime('%m/%d %H:%M') }}</span>
+                                                        </div>
+                                                    </div>
+                                                    <small class="text-muted d-block mt-2">
+                                                        <i class="fas fa-calendar me-1"></i>Requested: {{ req.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                                    </small>
+                                                </div>
+                                                <span class="badge bg-{{ 'warning' if req.status == 'pending' else 'success' if req.status == 'approved' else 'info' if req.status == 'completed' else 'danger' }} status-badge">
+                                                    {{ req.status|title }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 text-md-end">
+                                            {% if req.status == 'pending' %}
+                                                <div class="btn-group" role="group">
+                                                    <a href="{{ url_for('recipient.cancel_request', request_id=req.id) }}" 
+                                                       class="btn btn-outline-danger btn-sm"
+                                                       onclick="return confirm('Cancel this request?')">
+                                                        <i class="fas fa-times me-1"></i>Cancel
+                                                    </a>
+                                                </div>
+                                            {% elif req.status == 'approved' %}
+                                                <div class="alert alert-success py-2 mb-2">
+                                                    <i class="fas fa-check-circle me-1"></i>Approved! Contact donor for pickup.
+                                                </div>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-phone me-1"></i>{{ req.surplus_post.contact_phone }}
+                                                </small>
+                                            {% elif req.status == 'completed' %}
+                                                <div class="alert alert-info py-2 mb-2">
+                                                    <i class="fas fa-check-double me-1"></i>Completed
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-list fa-4x text-muted mb-3"></i>
+                            <h5 class="text-muted">No requests yet</h5>
+                            <p class="text-muted">Start browsing available food and make your first request!</p>
+                            <a href="{{ url_for('recipient.browse_food') }}" class="btn btn-success">
+                                <i class="fas fa-search me-2"></i>Browse Available Food
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-hover">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <a href="{{ url_for('recipient.browse_food') }}" class="card card-hover text-decoration-none h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-search fa-3x text-success mb-3"></i>
+                                    <h6>Browse Food</h6>
+                                    <p class="text-muted small mb-0">Find available food donations</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{{ url_for('main.browse_food') }}" class="card card-hover text-decoration-none h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-globe fa-3x text-primary mb-3"></i>
+                                    <h6>Public Browse</h6>
+                                    <p class="text-muted small mb-0">See all available food posts</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="#" class="card card-hover text-decoration-none h-100" onclick="showGuidelines()">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-book fa-3x text-warning mb-3"></i>
+                                    <h6>Guidelines</h6>
+                                    <p class="text-muted small mb-0">Food request best practices</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Guidelines Modal -->
+<div class="modal fade" id="guidelinesModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-book me-2 text-warning"></i>Food Request Guidelines
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6><i class="fas fa-check-circle text-success me-2"></i>Best Practices</h6>
+                                <ul class="small">
+                                    <li>Be respectful and polite in your requests</li>
+                                    <li>Provide clear pickup time preferences</li>
+                                    <li>Include your contact information</li>
+                                    <li>Be flexible with pickup arrangements</li>
+                                    <li>Thank donors for their generosity</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6><i class="fas fa-info-circle text-info me-2"></i>Important Notes</h6>
+                                <ul class="small">
+                                    <li>Food is provided as-is by generous donors</li>
+                                    <li>Always check food condition before consuming</li>
+                                    <li>Respect donor's pickup location and time</li>
+                                    <li>Cancel requests if you can't make pickup</li>
+                                    <li>Report any issues to the platform</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showGuidelines() {
+    const modal = new bootstrap.Modal(document.getElementById('guidelinesModal'));
+    modal.show();
+}
+
+// Auto-refresh dashboard every 30 seconds
+setInterval(function() {
+    // Refresh only if user is active
+    if (!document.hidden) {
+        location.reload();
+    }
+}, 30000);
+</script>
+{% endblock %}
+

@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}Post New Food - Mana Aid{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="card card-hover">
+                <div class="card-header text-center py-4" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; border-radius: 15px 15px 0 0;">
+                    <h4 class="mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>Post Surplus Food
+                    </h4>
+                    <p class="mb-0 mt-2 opacity-75">Share your surplus food with those in need</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" id="newPostForm">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="{{ form.title.id }}" class="form-label fw-semibold">
+                                    <i class="fas fa-tag me-2 text-primary"></i>Food Title *
+                                </label>
+                                {{ form.title(class="form-control", placeholder="e.g., Fresh Bread, Canned Vegetables, etc.") }}
+                                {% if form.title.errors %}
+                                    <div class="text-danger small">{{ form.title.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.food_type.id }}" class="form-label fw-semibold">
+                                    <i class="fas fa-utensils me-2 text-primary"></i>Food Type *
+                                </label>
+                                {{ form.food_type(class="form-select") }}
+                                {% if form.food_type.errors %}
+                                    <div class="text-danger small">{{ form.food_type.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.description.id }}" class="form-label fw-semibold">
+                                <i class="fas fa-align-left me-2 text-primary"></i>Description *
+                            </label>
+                            {{ form.description(class="form-control", rows="4", placeholder="Describe the food item, its condition, ingredients (if applicable), and any special notes...") }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small">{{ form.description.errors[0] }}</div>
+                            {% endif %}
+                            <div class="form-text">Be detailed and honest about the food's condition</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.quantity.id }}" class="form-label fw-semibold">
+                                    <i class="fas fa-sort-numeric-up me-2 text-primary"></i>Quantity (servings) *
+                                </label>
+                                {{ form.quantity(class="form-control", placeholder="e.g., 5") }}
+                                {% if form.quantity.errors %}
+                                    <div class="text-danger small">{{ form.quantity.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.expiry_time.id }}" class="form-label fw-semibold">
+                                    <i class="fas fa-clock me-2 text-primary"></i>Expiry Time *
+                                </label>
+                                {{ form.expiry_time(class="form-control", type="datetime-local") }}
+                                {% if form.expiry_time.errors %}
+                                    <div class="text-danger small">{{ form.expiry_time.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.pickup_location.id }}" class="form-label fw-semibold">
+                                <i class="fas fa-map-marker-alt me-2 text-primary"></i>Pickup Location *
+                            </label>
+                            {{ form.pickup_location(class="form-control", placeholder="e.g., 123 Main St, City, State or specific location details") }}
+                            {% if form.pickup_location.errors %}
+                                <div class="text-danger small">{{ form.pickup_location.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.contact_phone.id }}" class="form-label fw-semibold">
+                                    <i class="fas fa-phone me-2 text-primary"></i>Contact Phone *
+                                </label>
+                                {{ form.contact_phone(class="form-control", placeholder="e.g., (555) 123-4567") }}
+                                {% if form.contact_phone.errors %}
+                                    <div class="text-danger small">{{ form.contact_phone.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.image_url.id }}" class="form-label fw-semibold">
+                                    <i class="fas fa-image me-2 text-primary"></i>Image URL (optional)
+                                </label>
+                                {{ form.image_url(class="form-control", placeholder="https://example.com/image.jpg") }}
+                                {% if form.image_url.errors %}
+                                    <div class="text-danger small">{{ form.image_url.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirmDonation" required>
+                            <label class="form-check-label" for="confirmDonation">
+                                I confirm that this food is safe to consume and I'm willing to donate it to those in need
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            {{ form.submit(class="btn btn-primary btn-lg") }}
+                            <a href="{{ url_for('donor.dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Tips Card -->
+            <div class="card mt-4 card-hover">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>Donation Tips
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-success"><i class="fas fa-check-circle me-2"></i>Do's</h6>
+                            <ul class="small">
+                                <li>Donate fresh, unopened food</li>
+                                <li>Check expiration dates</li>
+                                <li>Pack food properly</li>
+                                <li>Include clear descriptions</li>
+                                <li>Be honest about food condition</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-danger"><i class="fas fa-times-circle me-2"></i>Don'ts</h6>
+                            <ul class="small">
+                                <li>Don't donate expired food</li>
+                                <li>Don't donate opened packages</li>
+                                <li>Don't donate spoiled food</li>
+                                <li>Don't donate recalled items</li>
+                                <li>Don't donate homemade food without proper labeling</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('newPostForm');
+    const expiryTime = document.getElementById('expiry_time');
+    const quantity = document.getElementById('quantity');
+    const confirmCheckbox = document.getElementById('confirmDonation');
+    
+    // Set minimum expiry time to current time + 1 hour
+    const now = new Date();
+    now.setHours(now.getHours() + 1);
+    const minDateTime = now.toISOString().slice(0, 16);
+    expiryTime.min = minDateTime;
+    
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Clear previous error states
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.classList.remove('is-invalid');
+        });
+        
+        // Validate required fields
+        const requiredFields = ['title', 'description', 'food_type', 'quantity', 'expiry_time', 'pickup_location', 'contact_phone'];
+        requiredFields.forEach(fieldName => {
+            const field = document.getElementById(fieldName);
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            }
+        });
+        
+        // Validate quantity
+        if (quantity.value && (parseInt(quantity.value) < 1 || parseInt(quantity.value) > 1000)) {
+            quantity.classList.add('is-invalid');
+            isValid = false;
+        }
+        
+        // Validate expiry time
+        if (expiryTime.value) {
+            const expiryDate = new Date(expiryTime.value);
+            if (expiryDate <= new Date()) {
+                expiryTime.classList.add('is-invalid');
+                isValid = false;
+            }
+        }
+        
+        // Validate confirmation checkbox
+        if (!confirmCheckbox.checked) {
+            confirmCheckbox.classList.add('is-invalid');
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+    
+    // Real-time validation
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            if (this.value.trim()) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+            }
+        });
+    });
+    
+    // Auto-format phone number
+    const phoneInput = document.getElementById('contact_phone');
+    phoneInput.addEventListener('input', function() {
+        let value = this.value.replace(/\D/g, '');
+        if (value.length >= 6) {
+            value = value.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+        } else if (value.length >= 3) {
+            value = value.replace(/(\d{3})(\d{0,3})/, '($1) $2');
+        }
+        this.value = value;
+    });
+});
+</script>
+{% endblock %} 

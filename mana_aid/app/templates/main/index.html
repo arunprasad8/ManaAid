@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Mana Aid{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="fas fa-heart text-warning"></i> Welcome to Mana Aid
+                </h1>
+                <p class="lead mb-4">Connecting surplus food with those in need. Together we can reduce food waste and fight hunger in our communities.</p>
+                {% if not current_user.is_authenticated %}
+                <div class="d-flex gap-3">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg px-4">
+                        <i class="fas fa-user-plus me-2"></i>Join Us
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                    </a>
+                </div>
+                {% else %}
+                <div class="d-flex gap-3">
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-light btn-lg px-4">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </a>
+                    <a href="{{ url_for('main.browse_food') }}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fas fa-search me-2"></i>Browse Food
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="fas fa-hands-helping fa-8x text-warning opacity-75"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 mb-4">
+                <div class="card stats-card h-100">
+                    <div class="card-body">
+                        <i class="fas fa-utensils fa-3x mb-3"></i>
+                        <h3 class="fw-bold">{{ total_posts }}</h3>
+                        <p class="mb-0">Food Posts</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card stats-card h-100">
+                    <div class="card-body">
+                        <i class="fas fa-handshake fa-3x mb-3"></i>
+                        <h3 class="fw-bold">{{ total_requests }}</h3>
+                        <p class="mb-0">Requests Made</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card stats-card h-100">
+                    <div class="card-body">
+                        <i class="fas fa-users fa-3x mb-3"></i>
+                        <h3 class="fw-bold">{{ total_volunteers }}</h3>
+                        <p class="mb-0">Volunteer Tasks</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card stats-card h-100">
+                    <div class="card-body">
+                        <i class="fas fa-gift fa-3x mb-3"></i>
+                        <h3 class="fw-bold">{{ total_sponsored }}</h3>
+                        <p class="mb-0">Sponsored Meals</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card text-center h-100 card-hover">
+                    <div class="card-body">
+                        <i class="fas fa-hand-holding-heart fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Donate Food</h5>
+                        <p class="card-text">Share your surplus food with those who need it most. Every donation makes a difference in someone's life.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card text-center h-100 card-hover">
+                    <div class="card-body">
+                        <i class="fas fa-users fa-3x text-success mb-3"></i>
+                        <h5 class="card-title">Connect Communities</h5>
+                        <p class="card-text">Build stronger communities by connecting donors, recipients, and volunteers through meaningful interactions.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card text-center h-100 card-hover">
+                    <div class="card-body">
+                        <i class="fas fa-leaf fa-3x text-warning mb-3"></i>
+                        <h5 class="card-title">Reduce Waste</h5>
+                        <p class="card-text">Help reduce food waste and environmental impact while helping those in need. Win-win for everyone.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">How It Works</h2>
+            <p class="lead text-muted">Simple steps to make a big difference</p>
+        </div>
+        <div class="row">
+            <div class="col-md-3 text-center mb-4">
+                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <i class="fas fa-plus fa-2x"></i>
+                </div>
+                <h5>1. Post Surplus Food</h5>
+                <p class="text-muted">Donors post available surplus food with details and pickup information.</p>
+            </div>
+            <div class="col-md-3 text-center mb-4">
+                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <i class="fas fa-search fa-2x"></i>
+                </div>
+                <h5>2. Browse & Request</h5>
+                <p class="text-muted">Recipients browse available food and make requests for what they need.</p>
+            </div>
+            <div class="col-md-3 text-center mb-4">
+                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <i class="fas fa-truck fa-2x"></i>
+                </div>
+                <h5>3. Coordinate Pickup</h5>
+                <p class="text-muted">Volunteers help coordinate pickup and delivery between donors and recipients.</p>
+            </div>
+            <div class="col-md-3 text-center mb-4">
+                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <i class="fas fa-heart fa-2x"></i>
+                </div>
+                <h5>4. Share & Connect</h5>
+                <p class="text-muted">Food reaches those in need, reducing waste and building community connections.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Food Posts Section -->
+{% if available_posts %}
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Recent Food Posts</h2>
+            <p class="lead text-muted">Fresh food available now</p>
+        </div>
+        <div class="row">
+            {% for post in available_posts %}
+            <div class="col-md-4 mb-4">
+                <div class="card food-card h-100">
+                    {% if post.image_url %}
+                    <img src="{{ post.image_url }}" class="card-img-top" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="fas fa-utensils fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ post.title }}</h5>
+                        <p class="card-text text-muted">{{ post.description[:100] }}{% if post.description|length > 100 %}...{% endif %}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-primary">{{ post.food_type }}</span>
+                            <small class="text-muted">{{ post.quantity }} servings</small>
+                        </div>
+                        {% if post.is_expired %}
+                        <span class="badge urgent-badge mt-2">Expired</span>
+                        {% else %}
+                        <small class="text-muted d-block mt-2">Expires: {{ post.time_until_expiry }}</small>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="{{ url_for('main.browse_food') }}" class="btn btn-outline-primary btn-sm">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{{ url_for('main.browse_food') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-search me-2"></i>Browse All Food
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %} 

@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block title %}Donor Dashboard - Mana Aid{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Dashboard Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-hover" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white;">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="mb-2">
+                                <i class="fas fa-tachometer-alt me-2"></i>Welcome back, {{ current_user.username }}!
+                            </h2>
+                            <p class="mb-0 opacity-75">Manage your food donations and help those in need</p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <a href="{{ url_for('donor.new_post') }}" class="btn btn-light btn-lg">
+                                <i class="fas fa-plus me-2"></i>Post New Food
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-utensils fa-2x mb-2"></i>
+                    <h3 class="fw-bold">{{ posts|length }}</h3>
+                    <p class="mb-0">Total Posts</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock fa-2x mb-2"></i>
+                    <h3 class="fw-bold">{{ pending_requests|length }}</h3>
+                    <p class="mb-0">Pending Requests</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <h3 class="fw-bold">{{ posts|selectattr('status', 'equalto', 'claimed')|list|length }}</h3>
+                    <p class="mb-0">Claimed Posts</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-2x mb-2"></i>
+                    <h3 class="fw-bold">{{ pending_requests|length + posts|selectattr('status', 'equalto', 'claimed')|list|length }}</h3>
+                    <p class="mb-0">People Helped</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Your Food Posts Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-hover">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-utensils me-2"></i>Your Food Posts
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if posts %}
+                        <div class="row g-3">
+                            {% for post in posts %}
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="card food-card h-100 card-hover">
+                                        {% if post.image_url %}
+                                            <img src="{{ post.image_url }}" class="card-img-top" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                                <i class="fas fa-utensils fa-3x text-muted"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="card-title mb-0">{{ post.title }}</h6>
+                                                <span class="badge bg-{{ 'success' if post.status == 'available' else 'warning' if post.status == 'claimed' else 'secondary' }} status-badge">
+                                                    {{ post.status|title }}
+                                                </span>
+                                            </div>
+                                            <p class="card-text text-muted small">{{ post.description[:80] }}{% if post.description|length > 80 %}...{% endif %}</p>
+                                            <div class="row text-center mb-2">
+                                                <div class="col-6">
+                                                    <small class="text-muted d-block">Type</small>
+                                                    <span class="badge bg-info">{{ post.food_type }}</span>
+                                                </div>
+                                                <div class="col-6">
+                                                    <small class="text-muted d-block">Quantity</small>
+                                                    <span class="fw-semibold">{{ post.quantity }} servings</span>
+                                                </div>
+                                            </div>
+                                            {% if post.is_expired %}
+                                                <div class="alert alert-danger py-2 mb-2">
+                                                    <i class="fas fa-exclamation-triangle me-1"></i>Expired
+                                                </div>
+                                            {% else %}
+                                                <small class="text-muted d-block">
+                                                    <i class="fas fa-clock me-1"></i>Expires: {{ post.expiry_time.strftime('%Y-%m-%d %H:%M') }}
+                                                </small>
+                                            {% endif %}
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <div class="d-flex gap-2">
+                                                <a href="{{ url_for('donor.view_post', post_id=post.id) }}" class="btn btn-outline-primary btn-sm flex-fill">
+                                                    <i class="fas fa-eye me-1"></i>View Details
+                                                </a>
+                                                {% if post.status == 'available' %}
+                                                    <button class="btn btn-outline-warning btn-sm" onclick="editPost({{ post.id }})">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-utensils fa-4x text-muted mb-3"></i>
+                            <h5 class="text-muted">No food posts yet</h5>
+                            <p class="text-muted">Start helping your community by posting surplus food!</p>
+                            <a href="{{ url_for('donor.new_post') }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Post Your First Food Item
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Requests Section -->
+    {% if pending_requests %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-hover">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock me-2"></i>Pending Requests ({{ pending_requests|length }})
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for req in pending_requests %}
+                            <div class="list-group-item border-0 mb-2 card-hover">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1">
+                                                    <i class="fas fa-user me-2 text-primary"></i>Request #{{ req.id }}
+                                                </h6>
+                                                <p class="mb-1 text-muted">
+                                                    <i class="fas fa-utensils me-1"></i>{{ req.surplus_post.title }}
+                                                </p>
+                                                <p class="mb-1">{{ req.message[:120] }}{% if req.message|length > 120 %}...{% endif %}</p>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-calendar me-1"></i>{{ req.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                                </small>
+                                            </div>
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 text-md-end">
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('donor.handle_request', request_id=req.id, action='approve') }}" 
+                                               class="btn btn-success btn-sm" 
+                                               onclick="return confirm('Approve this request?')">
+                                                <i class="fas fa-check me-1"></i>Approve
+                                            </a>
+                                            <a href="{{ url_for('donor.handle_request', request_id=req.id, action='reject') }}" 
+                                               class="btn btn-danger btn-sm"
+                                               onclick="return confirm('Reject this request?')">
+                                                <i class="fas fa-times me-1"></i>Reject
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-hover">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <a href="{{ url_for('donor.new_post') }}" class="card card-hover text-decoration-none h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-plus-circle fa-3x text-primary mb-3"></i>
+                                    <h6>Post New Food</h6>
+                                    <p class="text-muted small mb-0">Share surplus food with your community</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{{ url_for('main.browse_food') }}" class="card card-hover text-decoration-none h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-search fa-3x text-success mb-3"></i>
+                                    <h6>Browse Food</h6>
+                                    <p class="text-muted small mb-0">See what others are sharing</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="#" class="card card-hover text-decoration-none h-100" onclick="showTips()">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-lightbulb fa-3x text-warning mb-3"></i>
+                                    <h6>Donation Tips</h6>
+                                    <p class="text-muted small mb-0">Best practices for food donation</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tips Modal -->
+<div class="modal fade" id="tipsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-lightbulb me-2 text-warning"></i>Food Donation Tips
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6><i class="fas fa-check-circle text-success me-2"></i>Do's</h6>
+                                <ul class="small">
+                                    <li>Donate fresh, unopened food</li>
+                                    <li>Check expiration dates</li>
+                                    <li>Pack food properly</li>
+                                    <li>Include clear descriptions</li>
+                                    <li>Be honest about food condition</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6><i class="fas fa-times-circle text-danger me-2"></i>Don'ts</h6>
+                                <ul class="small">
+                                    <li>Don't donate expired food</li>
+                                    <li>Don't donate opened packages</li>
+                                    <li>Don't donate spoiled food</li>
+                                    <li>Don't donate recalled items</li>
+                                    <li>Don't donate homemade food without proper labeling</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showTips() {
+    const modal = new bootstrap.Modal(document.getElementById('tipsModal'));
+    modal.show();
+}
+
+function editPost(postId) {
+    // TODO: Implement edit functionality
+    alert('Edit functionality coming soon!');
+}
+
+// Auto-refresh dashboard every 30 seconds
+setInterval(function() {
+    // Refresh only if user is active
+    if (!document.hidden) {
+        location.reload();
+    }
+}, 30000);
+</script>
+{% endblock %}
+

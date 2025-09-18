@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block title %}Request Food - Mana Aid{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="card card-hover">
+                <div class="card-header text-center py-4" style="background: linear-gradient(135deg, var(--success-color), #20c997); color: white; border-radius: 15px 15px 0 0;">
+                    <h4 class="mb-0">
+                        <i class="fas fa-hand-holding-heart me-2"></i>Request Food
+                    </h4>
+                    <p class="mb-0 mt-2 opacity-75">Submit your request for this food item</p>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Food Item Summary -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-3 text-center">
+                                    {% if post.image_url %}
+                                        <img src="{{ post.image_url }}" class="img-fluid rounded" alt="{{ post.title }}" style="max-height: 100px; object-fit: cover;">
+                                    {% else %}
+                                        <i class="fas fa-utensils fa-3x text-muted"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-9">
+                                    <h6 class="mb-1">{{ post.title }}</h6>
+                                    <p class="text-muted small mb-2">{{ post.description[:100] }}{% if post.description|length > 100 %}...{% endif %}</p>
+                                    <div class="row text-center">
+                                        <div class="col-4">
+                                            <small class="text-muted d-block">Type</small>
+                                            <span class="badge bg-info">{{ post.food_type }}</span>
+                                        </div>
+                                        <div class="col-4">
+                                            <small class="text-muted d-block">Quantity</small>
+                                            <span class="fw-semibold">{{ post.quantity }} servings</span>
+                                        </div>
+                                        <div class="col-4">
+                                            <small class="text-muted d-block">Expires</small>
+                                            <span class="fw-semibold">{{ post.expiry_time.strftime('%m/%d %H:%M') }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="POST" id="requestForm">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.message.id }}" class="form-label fw-semibold">
+                                <i class="fas fa-comment me-2 text-success"></i>Message to Donor *
+                            </label>
+                            {{ form.message(class="form-control", rows="4", placeholder="Introduce yourself, explain why you need this food, and any special circumstances. Be polite and respectful.") }}
+                            {% if form.message.errors %}
+                                <div class="text-danger small">{{ form.message.errors[0] }}</div>
+                            {% endif %}
+                            <div class="form-text">Be honest and respectful in your request</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.preferred_pickup_time.id }}" class="form-label fw-semibold">
+                                    <i class="fas fa-clock me-2 text-success"></i>Preferred Pickup Time *
+                                </label>
+                                {{ form.preferred_pickup_time(class="form-control", type="datetime-local") }}
+                                {% if form.preferred_pickup_time.errors %}
+                                    <div class="text-danger small">{{ form.preferred_pickup_time.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.contact_phone.id }}" class="form-label fw-semibold">
+                                    <i class="fas fa-phone me-2 text-success"></i>Contact Phone *
+                                </label>
+                                {{ form.contact_phone(class="form-control", placeholder="Your phone number for coordination") }}
+                                {% if form.contact_phone.errors %}
+                                    <div class="text-danger small">{{ form.contact_phone.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.delivery_preference.id }}" class="form-label fw-semibold">
+                                <i class="fas fa-truck me-2 text-success"></i>Delivery Preference *
+                            </label>
+                            {{ form.delivery_preference(class="form-select") }}
+                            {% if form.delivery_preference.errors %}
+                                <div class="text-danger small">{{ form.delivery_preference.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3" id="deliveryAddressGroup" style="display: none;">
+                            <label for="{{ form.delivery_address.id }}" class="form-label fw-semibold">
+                                <i class="fas fa-map-marker-alt me-2 text-success"></i>Delivery Address
+                            </label>
+                            {{ form.delivery_address(class="form-control", placeholder="Your full address for delivery") }}
+                            {% if form.delivery_address.errors %}
+                                <div class="text-danger small">{{ form.delivery_address.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirmRequest" required>
+                            <label class="form-check-label" for="confirmRequest">
+                                I confirm that I will respect the pickup time and location, and I'm grateful for this donation
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            {{ form.submit(class="btn btn-success btn-lg") }}
+                            <a href="{{ url_for('recipient.view_post', post_id=post.id) }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Food Details
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Guidelines Card -->
+            <div class="card mt-4 card-hover">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>Request Guidelines
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-success"><i class="fas fa-check-circle me-2"></i>Do's</h6>
+                            <ul class="small">
+                                <li>Be polite and respectful</li>
+                                <li>Explain your situation honestly</li>
+                                <li>Be flexible with pickup times</li>
+                                <li>Thank the donor for their generosity</li>
+                                <li>Provide accurate contact information</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-danger"><i class="fas fa-times-circle me-2"></i>Don'ts</h6>
+                            <ul class="small">
+                                <li>Don't make multiple requests for the same item</li>
+                                <li>Don't be demanding or entitled</li>
+                                <li>Don't provide false information</li>
+                                <li>Don't miss pickup appointments</li>
+                                <li>Don't request if you can't pick up</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('requestForm');
+    const deliveryPreference = document.getElementById('delivery_preference');
+    const deliveryAddressGroup = document.getElementById('deliveryAddressGroup');
+    const deliveryAddress = document.getElementById('delivery_address');
+    const preferredPickupTime = document.getElementById('preferred_pickup_time');
+    const confirmCheckbox = document.getElementById('confirmRequest');
+    
+    // Set minimum pickup time to current time + 1 hour
+    const now = new Date();
+    now.setHours(now.getHours() + 1);
+    const minDateTime = now.toISOString().slice(0, 16);
+    preferredPickupTime.min = minDateTime;
+    
+    // Show/hide delivery address based on preference
+    deliveryPreference.addEventListener('change', function() {
+        if (this.value === 'delivery') {
+            deliveryAddressGroup.style.display = 'block';
+            deliveryAddress.required = true;
+        } else {
+            deliveryAddressGroup.style.display = 'none';
+            deliveryAddress.required = false;
+        }
+    });
+    
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Clear previous error states
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.classList.remove('is-invalid');
+        });
+        
+        // Validate required fields
+        const requiredFields = ['message', 'preferred_pickup_time', 'contact_phone', 'delivery_preference'];
+        requiredFields.forEach(fieldName => {
+            const field = document.getElementById(fieldName);
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            }
+        });
+        
+        // Validate delivery address if delivery is preferred
+        if (deliveryPreference.value === 'delivery' && !deliveryAddress.value.trim()) {
+            deliveryAddress.classList.add('is-invalid');
+            isValid = false;
+        }
+        
+        // Validate pickup time
+        if (preferredPickupTime.value) {
+            const pickupDate = new Date(preferredPickupTime.value);
+            if (pickupDate <= new Date()) {
+                preferredPickupTime.classList.add('is-invalid');
+                isValid = false;
+            }
+        }
+        
+        // Validate confirmation checkbox
+        if (!confirmCheckbox.checked) {
+            confirmCheckbox.classList.add('is-invalid');
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+    
+    // Real-time validation
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            if (this.value.trim()) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+            }
+        });
+    });
+    
+    // Auto-format phone number
+    const phoneInput = document.getElementById('contact_phone');
+    phoneInput.addEventListener('input', function() {
+        let value = this.value.replace(/\D/g, '');
+        if (value.length >= 6) {
+            value = value.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+        } else if (value.length >= 3) {
+            value = value.replace(/(\d{3})(\d{0,3})/, '($1) $2');
+        }
+        this.value = value;
+    });
+});
+</script>
+{% endblock %} 

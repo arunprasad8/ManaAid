@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Mana Aid{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7 col-xl-6">
+            <div class="card card-hover">
+                <div class="card-header text-center py-4" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; border-radius: 15px 15px 0 0;">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-plus me-2"></i>Join Mana Aid
+                    </h4>
+                    <p class="mb-0 mt-2 opacity-75">Create your account and start making a difference</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" id="registerForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="username" class="form-label fw-semibold">
+                                    <i class="fas fa-user me-2 text-primary"></i>Username *
+                                </label>
+                                <input type="text" class="form-control" id="username" name="username" 
+                                       placeholder="Choose a username" required autocomplete="username">
+                                <div class="form-text">Must be unique and at least 3 characters long</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label fw-semibold">
+                                    <i class="fas fa-envelope me-2 text-primary"></i>Email *
+                                </label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       placeholder="Enter your email" required autocomplete="email">
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label fw-semibold">
+                                    <i class="fas fa-lock me-2 text-primary"></i>Password *
+                                </label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="password" name="password" 
+                                           placeholder="Create a password" required autocomplete="new-password">
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <i class="fas fa-eye" id="eyeIcon"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text">Minimum 6 characters for security</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="confirm_password" class="form-label fw-semibold">
+                                    <i class="fas fa-lock me-2 text-primary"></i>Confirm Password *
+                                </label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" 
+                                           placeholder="Confirm your password" required autocomplete="new-password">
+                                    <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
+                                        <i class="fas fa-eye" id="eyeIconConfirm"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text">Please confirm your password</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="role" class="form-label fw-semibold">
+                                    <i class="fas fa-users me-2 text-primary"></i>Role *
+                                </label>
+                                <select class="form-select" id="role" name="role" required>
+                                    <option value="">Select your role</option>
+                                    <option value="donor">Donor - Share surplus food</option>
+                                    <option value="recipient">Recipient - Request food</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label fw-semibold">
+                                    <i class="fas fa-phone me-2 text-primary"></i>Phone Number
+                                </label>
+                                <input type="tel" class="form-control" id="phone" name="phone" 
+                                       placeholder="Enter your phone number" autocomplete="tel">
+                            </div>
+                        </div>
+                        
+
+                        
+                        <div class="mb-3">
+                            <label for="address" class="form-label fw-semibold">
+                                <i class="fas fa-map-marker-alt me-2 text-primary"></i>Address
+                            </label>
+                            <input type="text" class="form-control" id="address" name="address" 
+                                   placeholder="Enter your full address" autocomplete="street-address">
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="city" class="form-label fw-semibold">
+                                    <i class="fas fa-city me-2 text-primary"></i>City
+                                </label>
+                                <input type="text" class="form-control" id="city" name="city" 
+                                       placeholder="Enter your city" autocomplete="address-level2">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="state" class="form-label fw-semibold">
+                                    <i class="fas fa-map me-2 text-primary"></i>State
+                                </label>
+                                <input type="text" class="form-control" id="state" name="state" 
+                                       placeholder="Enter your state" autocomplete="address-level1">
+                            </div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and 
+                                <a href="#" class="text-decoration-none">Privacy Policy</a>
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>Create Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center py-3 bg-light">
+                    <p class="mb-0">
+                        <i class="fas fa-sign-in-alt me-1"></i>Already have an account? 
+                        <a href="{{ url_for('auth.login') }}" class="text-decoration-none fw-semibold">Login here</a>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Role Information Cards -->
+            <div class="row mt-4">
+                <div class="col-md-6 mb-3">
+                    <div class="card card-hover h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-hand-holding-heart fa-2x text-success mb-3"></i>
+                            <h6>Donor</h6>
+                            <p class="text-muted small mb-0">
+                                Share surplus food with those in need. Help reduce waste and support your community.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card card-hover h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-users fa-2x text-primary mb-3"></i>
+                            <h6>Recipient</h6>
+                            <p class="text-muted small mb-0">
+                                Request food from generous donors. Connect with your community for support.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Password toggle functionality
+    const togglePassword = document.getElementById('togglePassword');
+    const password = document.getElementById('password');
+    const eyeIcon = document.getElementById('eyeIcon');
+    
+    const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+    const confirmPassword = document.getElementById('confirm_password');
+    const eyeIconConfirm = document.getElementById('eyeIconConfirm');
+    
+    togglePassword.addEventListener('click', function() {
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        eyeIcon.classList.toggle('fa-eye');
+        eyeIcon.classList.toggle('fa-eye-slash');
+    });
+    
+    toggleConfirmPassword.addEventListener('click', function() {
+        const type = confirmPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+        confirmPassword.setAttribute('type', type);
+        eyeIconConfirm.classList.toggle('fa-eye');
+        eyeIconConfirm.classList.toggle('fa-eye-slash');
+    });
+    
+    // Form validation
+    const form = document.getElementById('registerForm');
+    const requiredFields = ['username', 'email', 'password', 'confirm_password', 'role'];
+    
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Clear previous error states
+        requiredFields.forEach(fieldName => {
+            const field = document.getElementById(fieldName);
+            field.classList.remove('is-invalid');
+        });
+        
+        // Validate required fields
+        requiredFields.forEach(fieldName => {
+            const field = document.getElementById(fieldName);
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            }
+        });
+        
+        // Validate username length
+        const username = document.getElementById('username');
+        if (username.value.trim().length < 3) {
+            username.classList.add('is-invalid');
+            isValid = false;
+        }
+        
+        // Validate password length
+        const passwordField = document.getElementById('password');
+        if (passwordField.value.length < 6) {
+            passwordField.classList.add('is-invalid');
+            isValid = false;
+        }
+        
+        // Validate password confirmation
+        const confirmPasswordField = document.getElementById('confirm_password');
+        if (passwordField.value !== confirmPasswordField.value) {
+            confirmPasswordField.classList.add('is-invalid');
+            isValid = false;
+        }
+        
+        // Validate email format
+        const email = document.getElementById('email');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email.value)) {
+            email.classList.add('is-invalid');
+            isValid = false;
+        }
+        
+        // Validate terms checkbox
+        const terms = document.getElementById('terms');
+        if (!terms.checked) {
+            terms.classList.add('is-invalid');
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+    
+    // Real-time validation
+    requiredFields.forEach(fieldName => {
+        const field = document.getElementById(fieldName);
+        field.addEventListener('input', function() {
+            if (this.value.trim()) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            } else {
+                this.classList.remove('is-valid');
+            }
+        });
+    });
+    
+    // Password strength indicator and confirmation validation
+    const passwordField = document.getElementById('password');
+    const confirmPasswordField = document.getElementById('confirm_password');
+    
+    function validatePasswordConfirmation() {
+        const password = passwordField.value;
+        const confirmPassword = confirmPasswordField.value;
+        
+        if (confirmPassword && password !== confirmPassword) {
+            confirmPasswordField.classList.add('is-invalid');
+            confirmPasswordField.classList.remove('is-valid');
+        } else if (confirmPassword && password === confirmPassword) {
+            confirmPasswordField.classList.add('is-valid');
+            confirmPasswordField.classList.remove('is-invalid');
+        } else {
+            confirmPasswordField.classList.remove('is-valid', 'is-invalid');
+        }
+    }
+    
+    passwordField.addEventListener('input', function() {
+        const password = this.value;
+        let strength = 0;
+        
+        if (password.length >= 6) strength++;
+        if (password.match(/[a-z]/)) strength++;
+        if (password.match(/[A-Z]/)) strength++;
+        if (password.match(/[0-9]/)) strength++;
+        if (password.match(/[^a-zA-Z0-9]/)) strength++;
+        
+        this.classList.remove('is-valid', 'is-invalid');
+        if (strength >= 3) {
+            this.classList.add('is-valid');
+        } else if (password.length > 0) {
+            this.classList.add('is-invalid');
+        }
+        
+        // Check password confirmation when password changes
+        validatePasswordConfirmation();
+    });
+    
+    confirmPasswordField.addEventListener('input', validatePasswordConfirmation);
+});
+</script>
+{% endblock %} 

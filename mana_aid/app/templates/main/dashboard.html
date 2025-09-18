@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Mana Aid{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+        <p class="lead">Welcome back, {{ current_user.username }}!</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-user fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Your Profile</h5>
+                <p class="card-text">Role: <span class="badge bg-secondary">{{ current_user.role.title() }}</span></p>
+                <p class="card-text">Member since: {{ current_user.created_at.strftime('%B %Y') }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-info-circle fa-3x text-info mb-3"></i>
+                <h5 class="card-title">Platform Info</h5>
+                <p class="card-text">This is a basic dashboard. More features will be added based on your role.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-cog fa-3x text-warning mb-3"></i>
+                <h5 class="card-title">Quick Actions</h5>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('main.index') }}" class="btn btn-outline-primary">Go Home</a>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-lightbulb"></i> Coming Soon</h5>
+            </div>
+            <div class="card-body">
+                <p>This is a basic version of Mana Aid. Future features will include:</p>
+                <ul>
+                    <li><strong>For Donors:</strong> Post surplus food, manage requests, track donations</li>
+                    <li><strong>For Recipients:</strong> Browse available food, make requests, track orders</li>
+                    <li><strong>For Volunteers:</strong> Accept delivery tasks, coordinate pickups</li>
+                    <li><strong>For NGOs:</strong> Manage sponsored meals, view analytics</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

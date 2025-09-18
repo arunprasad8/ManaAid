@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Food - Recipient Dashboard{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-hover" style="background: linear-gradient(135deg, var(--success-color), #20c997); color: white;">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="mb-2">
+                                <i class="fas fa-search me-2"></i>Available Food
+                            </h2>
+                            <p class="mb-0 opacity-75">Browse and request food from generous donors in your community</p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <a href="{{ url_for('recipient.dashboard') }}" class="btn btn-light">
+                                <i class="fas fa-tachometer-alt me-2"></i>My Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-hover">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="searchInput" class="form-label fw-semibold">
+                                <i class="fas fa-search me-2 text-success"></i>Search Food
+                            </label>
+                            <input type="text" class="form-control" id="searchInput" placeholder="Search by title, description, or location...">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="foodTypeFilter" class="form-label fw-semibold">
+                                <i class="fas fa-filter me-2 text-success"></i>Food Type
+                            </label>
+                            <select class="form-select" id="foodTypeFilter">
+                                <option value="">All Types</option>
+                                <option value="Bakery">Bakery</option>
+                                <option value="Dairy">Dairy</option>
+                                <option value="Fruits">Fruits</option>
+                                <option value="Vegetables">Vegetables</option>
+                                <option value="Meat">Meat</option>
+                                <option value="Grains">Grains</option>
+                                <option value="Canned Goods">Canned Goods</option>
+                                <option value="Frozen Foods">Frozen Foods</option>
+                                <option value="Prepared Meals">Prepared Meals</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="sortBy" class="form-label fw-semibold">
+                                <i class="fas fa-sort me-2 text-success"></i>Sort By
+                            </label>
+                            <select class="form-select" id="sortBy">
+                                <option value="newest">Newest First</option>
+                                <option value="expiring">Expiring Soon</option>
+                                <option value="quantity">Highest Quantity</option>
+                                <option value="distance">Nearest Location</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">
+                                <i class="fas fa-eye me-2 text-success"></i>View
+                            </label>
+                            <div class="btn-group w-100" role="group">
+                                <button type="button" class="btn btn-outline-success active" id="gridView">
+                                    <i class="fas fa-th"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-success" id="listView">
+                                    <i class="fas fa-list"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Summary -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-utensils me-2 text-success"></i>
+                    <span id="resultsCount">{{ posts|length }}</span> Available Items
+                </h5>
+                <a href="{{ url_for('main.browse_food') }}" class="btn btn-outline-success">
+                    <i class="fas fa-globe me-2"></i>Public Browse
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Food Posts Grid -->
+    <div class="row g-4" id="foodGrid">
+        {% if posts and posts|length > 0 %}
+            {% for post in posts %}
+                <div class="col-md-6 col-lg-4 food-item" 
+                     data-title="{{ post.title|lower }}" 
+                     data-description="{{ post.description|lower }}"
+                     data-location="{{ post.pickup_location|lower }}"
+                     data-type="{{ post.food_type }}"
+                     data-expiry="{{ post.expiry_time.isoformat() }}"
+                     data-quantity="{{ post.quantity }}">
+                    <div class="card food-card h-100 card-hover">
+                        {% if post.image_url %}
+                            <img src="{{ post.image_url }}" class="card-img-top" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="fas fa-utensils fa-3x text-muted"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="card-title mb-0">{{ post.title }}</h6>
+                                <span class="badge bg-success status-badge">{{ post.status|title }}</span>
+                            </div>
+                            <p class="card-text flex-grow-1 text-muted">{{ post.description[:100] }}{% if post.description|length > 100 %}...{% endif %}</p>
+                            
+                            <div class="row text-center mb-3">
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Type</small>
+                                    <span class="badge bg-info">{{ post.food_type }}</span>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Quantity</small>
+                                    <span class="fw-semibold">{{ post.quantity }} servings</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <small class="text-muted d-block">
+                                    <i class="fas fa-map-marker-alt me-1"></i>{{ post.pickup_location }}
+                                </small>
+                                <small class="text-muted d-block">
+                                    <i class="fas fa-user me-1"></i>Donor: {{ post.donor.username }}
+                                </small>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                {% if post.is_expired %}
+                                    <span class="badge urgent-badge">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>Expired
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-clock me-1"></i>Expires: {{ post.expiry_time.strftime('%m/%d %H:%M') }}
+                                    </span>
+                                {% endif %}
+                                
+                                <a href="{{ url_for('recipient.view_post', post_id=post.id) }}" class="btn btn-success btn-sm">
+                                    <i class="fas fa-eye me-1"></i>View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="fas fa-utensils fa-4x text-muted mb-3"></i>
+                    <h5 class="text-muted">No available food posts right now</h5>
+                    <p class="text-muted">Please check back later or browse the public food listings.</p>
+                    <a href="{{ url_for('main.browse_food') }}" class="btn btn-success">
+                        <i class="fas fa-globe me-2"></i>Browse Public Listings
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const foodTypeFilter = document.getElementById('foodTypeFilter');
+    const sortBy = document.getElementById('sortBy');
+    const gridView = document.getElementById('gridView');
+    const listView = document.getElementById('listView');
+    const foodGrid = document.getElementById('foodGrid');
+    const resultsCount = document.getElementById('resultsCount');
+    const foodItems = document.querySelectorAll('.food-item');
+
+    // Search and filter functionality
+    function filterItems() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedType = foodTypeFilter.value.toLowerCase();
+        let visibleCount = 0;
+
+        foodItems.forEach(item => {
+            const title = item.dataset.title;
+            const description = item.dataset.description;
+            const location = item.dataset.location;
+            const type = item.dataset.type.toLowerCase();
+            
+            const matchesSearch = title.includes(searchTerm) || 
+                                description.includes(searchTerm) || 
+                                location.includes(searchTerm);
+            const matchesType = !selectedType || type === selectedType;
+            
+            if (matchesSearch && matchesType) {
+                item.style.display = 'block';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        resultsCount.textContent = visibleCount;
+    }
+
+    // Sort functionality
+    function sortItems() {
+        const sortValue = sortBy.value;
+        const itemsArray = Array.from(foodItems);
+        
+        itemsArray.sort((a, b) => {
+            switch(sortValue) {
+                case 'newest':
+                    return new Date(b.dataset.expiry) - new Date(a.dataset.expiry);
+                case 'expiring':
+                    return new Date(a.dataset.expiry) - new Date(b.dataset.expiry);
+                case 'quantity':
+                    return parseInt(b.dataset.quantity) - parseInt(a.dataset.quantity);
+                default:
+                    return 0;
+            }
+        });
+
+        itemsArray.forEach(item => foodGrid.appendChild(item));
+    }
+
+    // View toggle functionality
+    function toggleView(view) {
+        if (view === 'list') {
+            foodGrid.classList.remove('row');
+            foodGrid.classList.add('list-view');
+            foodItems.forEach(item => {
+                item.classList.remove('col-md-6', 'col-lg-4');
+                item.classList.add('col-12', 'mb-3');
+            });
+        } else {
+            foodGrid.classList.remove('list-view');
+            foodGrid.classList.add('row');
+            foodItems.forEach(item => {
+                item.classList.remove('col-12', 'mb-3');
+                item.classList.add('col-md-6', 'col-lg-4');
+            });
+        }
+    }
+
+    // Event listeners
+    searchInput.addEventListener('input', filterItems);
+    foodTypeFilter.addEventListener('change', filterItems);
+    sortBy.addEventListener('change', sortItems);
+    
+    gridView.addEventListener('click', function() {
+        gridView.classList.add('active');
+        listView.classList.remove('active');
+        toggleView('grid');
+    });
+    
+    listView.addEventListener('click', function() {
+        listView.classList.add('active');
+        gridView.classList.remove('active');
+        toggleView('list');
+    });
+
+    // Initialize
+    filterItems();
+});
+
+// Add some CSS for list view
+const style = document.createElement('style');
+style.textContent = `
+    .list-view .food-item .card {
+        flex-direction: row;
+    }
+    .list-view .food-item .card-img-top {
+        width: 200px;
+        height: 150px !important;
+        flex-shrink: 0;
+    }
+    .list-view .food-item .card-body {
+        flex: 1;
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %} 
